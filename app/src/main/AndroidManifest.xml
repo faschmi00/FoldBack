@@ -1,6 +1,22 @@
 <?xml version="1.0" encoding="utf-8"?>
-<manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools">
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <!-- Für "Sperrbildschirm schwarz". Wird ohne Nachfrage erteilt. -->
+    <uses-permission android:name="android.permission.SET_WALLPAPER" />
+
+    <!-- Ab Android 11 nötig, damit getLaunchIntentForPackage() diese Apps findet. -->
+    <queries>
+        <package android:name="com.whatsapp" />
+        <package android:name="com.whatsapp.w4b" />
+        <package android:name="com.snapchat.android" />
+        <package android:name="com.spotify.music" />
+        <package android:name="com.google.android.keep" />
+        <package android:name="com.samsung.android.app.notes" />
+        <package android:name="com.miui.notes" />
+        <package android:name="com.oneplus.note" />
+        <package android:name="com.coloros.note" />
+        <package android:name="com.huawei.notepad" />
+    </queries>
 
     <application
         android:allowBackup="true"
@@ -10,6 +26,24 @@
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
-        android:theme="@style/Theme.FoldBack" />
+        android:theme="@style/Theme.FoldBack">
+
+        <activity
+            android:name=".MainActivity"
+            android:clearTaskOnLaunch="true"
+            android:excludeFromRecents="true"
+            android:exported="true"
+            android:launchMode="singleTask"
+            android:resumeWhilePausing="true"
+            android:screenOrientation="portrait"
+            android:stateNotNeeded="true">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.HOME" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+    </application>
 
 </manifest>
