@@ -9,6 +9,9 @@
         <package android:name="com.whatsapp" />
         <package android:name="com.whatsapp.w4b" />
         <package android:name="com.snapchat.android" />
+        <package android:name="org.telegram.messenger" />
+        <package android:name="org.telegram.messenger.web" />
+        <package android:name="org.thunderdog.challegram" />
         <package android:name="com.spotify.music" />
         <package android:name="com.google.android.keep" />
         <package android:name="com.samsung.android.app.notes" />
@@ -16,6 +19,13 @@
         <package android:name="com.oneplus.note" />
         <package android:name="com.coloros.note" />
         <package android:name="com.huawei.notepad" />
+        <package android:name="com.google.android.calculator" />
+        <package android:name="com.sec.android.app.popupcalculator" />
+        <package android:name="com.miui.calculator" />
+        <package android:name="com.oneplus.calculator" />
+        <package android:name="com.coloros.calculator" />
+        <package android:name="com.huawei.calculator" />
+        <package android:name="com.android.calculator2" />
     </queries>
 
     <application
@@ -42,6 +52,30 @@
                 <category android:name="android.intent.category.HOME" />
                 <category android:name="android.intent.category.DEFAULT" />
                 <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+
+        <!-- Encrogram: verschlüsselte Nachrichten über Telegram. Siehe ENCROGRAM.md. -->
+        <activity
+            android:name=".encrogram.ui.EncrogramActivity"
+            android:excludeFromRecents="true"
+            android:exported="false"
+            android:windowSoftInputMode="adjustResize" />
+
+        <!-- „Entschlüsseln“ im Textmenü anderer Apps. Muss exportiert sein, damit Telegram sie aufrufen kann. -->
+        <activity
+            android:name=".encrogram.ui.DecryptActivity"
+            android:configChanges="orientation|screenSize|screenLayout|smallestScreenSize|keyboardHidden"
+            android:excludeFromRecents="true"
+            android:exported="true"
+            android:label="Entschlüsseln"
+            android:noHistory="true"
+            android:theme="@style/Theme.Encrogram.Dialog"
+            android:windowSoftInputMode="adjustResize">
+            <intent-filter>
+                <action android:name="android.intent.action.PROCESS_TEXT" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <data android:mimeType="text/plain" />
             </intent-filter>
         </activity>
     </application>

@@ -30,8 +30,8 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.ArrowBack
+import androidx.compose.material.icons.automirrored.outlined.KeyboardArrowRight
 import androidx.compose.material.icons.outlined.Bolt
-import androidx.compose.material.icons.outlined.MoreHoriz
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
@@ -62,11 +62,17 @@ private val Background = Color.Black
 private val Foreground = Color.White
 private val Muted = Color(0xFF8A8A8A)
 
+/**
+ * [path] sind die geöffneten Unterseiten, von der Startseite aus gesehen.
+ * Leer = Startseite.
+ */
 @Composable
-fun HomeScreen(showMore: Boolean, onShowMoreChange: (Boolean) -> Unit) {
+fun HomeScreen(path: List<MenuFolder>, onPathChange: (List<MenuFolder>) -> Unit) {
     val context = LocalContext.current
-    // Auf der Seite "Menü" führt "Zurück" zur Hauptseite.
-    BackHandler(enabled = showMore) { onShowMoreChange(false) }
+    val folder = path.lastOrNull() ?: homeFolder
+    val goBack = { onPathChange(path.dropLast(1)) }
+    // Auf einer Unterseite führt "Zurück" eine Ebene nach oben.
+    BackHandler(enabled = path.isNotEmpty(), onBack = goBack)
 
     Column(
         modifier = Modifier
@@ -84,22 +90,27 @@ fun HomeScreen(showMore: Boolean, onShowMoreChange: (Boolean) -> Unit) {
         Spacer(Modifier.height(28.dp))
         HorizontalDivider(color = Foreground.copy(alpha = 0.25f))
         Spacer(Modifier.height(12.dp))
-        if (showMore) {
-            MenuRow("Zurück", Icons.AutoMirrored.Outlined.ArrowBack) { onShowMoreChange(false) }
-            moreApps.forEach { app ->
-                MenuRow(app.label, app.icon) { context.launch(app) }
+        if (path.isNotEmpty()) {
+            MenuRow("Zurück", Icons.AutoMirrored.Outlined.ArrowBack, onClick = goBack)
+        }
+        folder.entries.forEach { entry ->
+            when (entry) {
+                is LauncherApp -> MenuRow(entry.label, entry.icon) { context.launch(entry) }
+                is MenuFolder -> MenuRow(entry.label, entry.icon, opensFolder = true) {
+                    onPathChange(path + entry)
+                }
             }
-        } else {
-            homeApps.forEach { app ->
-                MenuRow(app.label, app.icon) { context.launch(app) }
-            }
-            MenuRow("Menü", Icons.Outlined.MoreHoriz) { onShowMoreChange(true) }
         }
     }
 }
 
 @Composable
-private fun MenuRow(label: String, icon: ImageVector, onClick: () -> Unit) {
+private fun MenuRow(
+    label: String,
+    icon: ImageVector,
+    opensFolder: Boolean = false,
+    onClick: () -> Unit,
+) {
     val interaction = remember { MutableInteractionSource() }
     val focused by interaction.collectIsFocusedAsState()
     val pressed by interaction.collectIsPressedAsState()
@@ -117,7 +128,15 @@ private fun MenuRow(label: String, icon: ImageVector, onClick: () -> Unit) {
     ) {
         Icon(icon, contentDescription = null, tint = fg, modifier = Modifier.size(28.dp))
         Spacer(Modifier.width(20.dp))
-        Text(label, color = fg, fontSize = 22.sp)
+        Text(label, color = fg, fontSize = 22.sp, modifier = Modifier.weight(1f))
+        if (opensFolder) {
+            Icon(
+                Icons.AutoMirrored.Outlined.KeyboardArrowRight,
+                contentDescription = null,
+                tint = fg,
+                modifier = Modifier.size(24.dp),
+            )
+        }
     }
 }
 
@@ -230,11 +249,11 @@ private fun <T> rememberBroadcastState(filter: IntentFilter, map: (Intent?) -> T
 @Preview(widthDp = 360, heightDp = 760)
 @Composable
 private fun HomeScreenPreview() {
-    HomeScreen(showMore = false, onShowMoreChange = {})
+    HomeScreen(path = emptyList(), onPathChange = {})
 }
 
 @Preview(widthDp = 360, heightDp = 760)
 @Composable
 private fun MoreScreenPreview() {
-    HomeScreen(showMore = true, onShowMoreChange = {})
+    HomeScreen(path = listOf(homeFolder.entries.filterIsInstance<MenuFolder>().first()), onPathChange = {})
 }

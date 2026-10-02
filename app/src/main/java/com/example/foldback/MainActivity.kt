@@ -17,11 +17,13 @@ import androidx.core.view.WindowInsetsControllerCompat
 
 class MainActivity : ComponentActivity() {
 
-    private var showMore by mutableStateOf(false)
+    /** Geöffnete Unterseiten; leer = Startseite. */
+    private var path by mutableStateOf(emptyList<MenuFolder>())
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         ensureBlackWallpaper()
+        Torch.init(this)
         enableEdgeToEdge(
             statusBarStyle = SystemBarStyle.dark(Color.TRANSPARENT),
             navigationBarStyle = SystemBarStyle.dark(Color.TRANSPARENT),
@@ -29,14 +31,14 @@ class MainActivity : ComponentActivity() {
         setContent {
             // Der Launcher ist die unterste Ebene – "Zurück" hat hier nichts zu tun.
             BackHandler {}
-            HomeScreen(showMore = showMore, onShowMoreChange = { showMore = it })
+            HomeScreen(path = path, onPathChange = { path = it })
         }
     }
 
     /** Home-Taste, während der Launcher schon läuft: immer zurück zur Hauptseite. */
     override fun onNewIntent(intent: Intent) {
         super.onNewIntent(intent)
-        showMore = false
+        path = emptyList()
     }
 
     override fun onResume() {
